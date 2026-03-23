@@ -1,5 +1,4 @@
 # 🌟 DoToday — What Should I Do Today?
-# WHAT TO DO NOW MC
   
 A simple web app that helps you decide what to do based on your **mood, time, and weather**.
 
@@ -48,3 +47,5 @@ DoToday/
 - 📍 Auto-detect location for real-time weather  
 - ❤️ Save favorite activities  
 - 🔔 Daily suggestion notifications  
+
+# WHAT TO DO NOW MC
