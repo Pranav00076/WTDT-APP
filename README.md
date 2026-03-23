@@ -1,5 +1,6 @@
 # 🌟 DoToday — What Should I Do Today?
-  #WHAT TO DO NOW MC
+# WHAT TO DO NOW MC
+  
 A simple web app that helps you decide what to do based on your **mood, time, and weather**.
 
 ---
