@@ -1,72 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>DoToday</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="root">
+        <header>
+            <h3 id="appname">DoToday</h3>
+            <h1>What to do Now?</h1>
+        </header>
 
-  <div class="app">
+        <div id="genre_display"></div>
 
-    <header>
-      <h2>💡 DoToday</h2>
-    </header>
+        <div id="movies_display"></div>
 
-    <section class="hero">
-      <h1>What should I do today?</h1>
-      <p>Get personalized activity suggestions</p>
-    </section>
-
-    <section class="controls">
-
-      <div class="block">
-        <p>Your Mood</p>
-        <div class="moods">
-          <button onclick="setMood('happy')">😊 Happy</button>
-          <button onclick="setMood('bored')">😐 Bored</button>
-          <button onclick="setMood('energetic')">💪 Energetic</button>
-          <button onclick="setMood('relaxed')">🧘 Relaxed</button>
-        </div>
-      </div>
-
-      <div class="block">
-        <p>Time Available</p>
-        <input type="range" min="15" max="180" step="15" id="timeRange" />
-        <span id="timeLabel">30 min</span>
-      </div>
-
-      <div class="block">
-        <p>Your Location</p>
-        <input type="text" id="city" placeholder="Enter your city..." />
-      </div>
-
-    </section>
-
-    <div class="center">
-      <button class="main-btn" onclick="getSuggestion()">
-        Get Suggestion →
-      </button>
     </div>
-
-    <section class="result" id="resultBox">
-      <h2>Today's Suggestion</h2>
-
-      <div class="card">
-        <h3 id="title">--</h3>
-        <p id="desc">Click the button to get suggestion</p>
-      </div>
-
-      <div class="options">
-        <div>🏋️ Workout</div>
-        <div>🍳 Cook</div>
-        <div>🌳 Go Out</div>
-        <div>🎮 Game</div>
-      </div>
-    </section>
-
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
+
