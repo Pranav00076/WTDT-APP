@@ -1,85 +1,189 @@
-let genre_display = document.getElementById("genre_display")
-let movies_display = document.getElementById("movies_display")
-
 const apiKey = "36aae90582723ed9c3894e15dddbb1ab";
-const genreurl = `https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}&language=en-US`;
+const weatherKey = "cdc47ddac1ec469381f215204263003";
 
+let appMode = "home";
 
-function renderMovies(data = []) {
-    data.forEach((movie, idx) => {
-        let movieCard = document.createElement("div")
-        movieCard.className = "MovieCard"
+let appState = {
+  mood: null,
+  genreId: null,
+  searchQuery: ""
+};
 
-        let srNo = document.createElement("div")
-        srNo.id = idx
-        srNo.innerHTML = `<h2>${idx + 1}</h2>`
-        movieCard.appendChild(srNo)
+const moodToGenre = {
+  happy: 35,
+  bored: 99,
+  energetic: 28,
+  relaxed: 18
+};
 
-        let Poster = document.createElement("div")
-        Poster.className = "Image"
-        Poster.innerHTML = `<img src=https://image.tmdb.org/t/p/w500${movie.poster_path} alt=${movie.title} />`
-        movieCard.appendChild(Poster)
-        
-        let rating = document.createElement("div")
-        rating.className = "rating"
-        rating.innerHTML = `<p id="rate">Rating - ${movie.vote_average} (${movie.vote_count})</p>`
-        movieCard.appendChild(rating)
+function setMode(mode) {
+  appMode = mode;
 
-        let title = document.createElement("h2")
-        title.id = "title"
-        title.innerText = movie.title
-        movieCard.appendChild(title)
+  homeScreen.classList.add("hidden");
+  appScreen.classList.remove("hidden");
 
-        let releaseDate = document.createElement("p")
-        releaseDate.id = "releaseDate"
-        releaseDate.innerText = movie.release_date
-        movieCard.append(releaseDate)
-
-        movies_display.appendChild(movieCard)
-    })
+  updateUI();
 }
 
-function renderGenre(data = []){
-    
-    let genreList = document.createElement("div")
-    data.forEach(genre => {
-        let genreCard = document.createElement("button")
-        genreCard.innerText = genre.name
-        genreCard.setAttribute('value' , genre.id)
-        genreCard.setAttribute('class' , "genre-class")
-
-        genreCard.addEventListener("click" , (e) => {
-            let genreId = e.target.value
-            const moviesUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${genreId}`
-            fetch(moviesUrl)
-            .then(data => data.json())
-            .then(data => data.results)
-            .then(data => {
-                movies_display.innerHTML = "";
-                renderMovies(data)
-            })
-        })
-
-        genreList.appendChild(genreCard)
-    })
-    genre_display.appendChild(genreList)
+function goHome() {
+  homeScreen.classList.remove("hidden");
+  appScreen.classList.add("hidden");
 }
 
+function updateUI() {
+  movieSection.classList.add("hidden");
+  cookingSection.classList.add("hidden");
+  weatherSection.classList.add("hidden");
 
+  if (appMode === "movie") movieSection.classList.remove("hidden");
+  if (appMode === "cooking") cookingSection.classList.remove("hidden");
+  if (appMode === "weather") weatherSection.classList.remove("hidden");
+}
 
-fetch(genreurl)
-.then(x=>x.json())
-.then(data=>data.genres)
-.then(data=>{
-    renderGenre(data)
-})
+// MOVIES
+function renderMovies(movies) {
+  movies_display.innerHTML = "";
 
-document.querySelectorAll('.my-button-class').forEach(btn => {
-  btn.addEventListener('click', function() {
-    // Logs the value attribute of the clicked button
-    console.log(this.value); 
-    
-    // Alternatively, logs the text content inside the button
-    // console.log(this.innerText);
+  movies.forEach(movie => {
+    const div = document.createElement("div");
+    div.className = "movie";
+
+    const img = movie.poster_path
+      ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+      : "https://via.placeholder.com/300x450";
+
+    div.innerHTML = `
+      <img src="${img}" />
+      <h3>${movie.title}</h3>
+      <p>⭐ ${movie.vote_average}</p>
+    `;
+
+    movies_display.appendChild(div);
   });
-});   
+}
+
+function fetchMovies() {
+  let url = "";
+
+  if (appState.searchQuery) {
+    url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${appState.searchQuery}`;
+  } else if (appState.genreId) {
+    url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${appState.genreId}`;
+  } else if (appState.mood) {
+    const g = moodToGenre[appState.mood];
+    url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&with_genres=${g}`;
+  }
+
+  if (!url) return;
+
+  movies_display.innerHTML = "Loading...";
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => renderMovies(data.results || []));
+}
+
+// EVENTS
+function setMood(m) {
+  appState.mood = m;
+  appState.genreId = null;
+  appState.searchQuery = "";
+  searchInput.value = "";
+  fetchMovies();
+}
+
+searchInput.addEventListener("input", e => {
+  appState.searchQuery = e.target.value;
+  appState.genreId = null;
+  fetchMovies();
+});
+
+// GENRES
+fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}`)
+  .then(res => res.json())
+  .then(data => {
+    data.genres.forEach(g => {
+      let btn = document.createElement("button");
+      btn.innerText = g.name;
+
+      btn.onclick = () => {
+        appState.genreId = g.id;
+        appState.searchQuery = "";
+        searchInput.value = "";
+        fetchMovies();
+      };
+
+      genre_display.appendChild(btn);
+    });
+  });
+
+// WEATHER
+function getWeather() {
+  const city = document.getElementById("cityInput").value;
+
+  const url = `https://api.weatherapi.com/v1/current.json?key=${weatherKey}&q=${city}`;
+
+  weatherResult.innerHTML = "Loading...";
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      const condition = data.current.condition.text.toLowerCase();
+      const temp = data.current.temp_c;
+      const location = data.location.name;
+
+      let suggestion = "";
+      let action = "";
+
+      if (condition.includes("rain")) {
+        suggestion = "Perfect weather for movies 🎬";
+        action = "movie";
+      }
+
+      else if (condition.includes("sun") || condition.includes("clear")) {
+        suggestion = "Great time to go outside 🌳";
+        action = "outdoor";
+      }
+
+      else if (condition.includes("cloud")) {
+        suggestion = "Nice cozy weather for cooking 🍳";
+        action = "cooking";
+      }
+
+      else {
+        suggestion = "Try something relaxing 😊";
+        action = "general";
+      }
+
+      weatherResult.innerHTML = `
+        <h3>${location}</h3>
+        <p>🌡️ ${temp}°C</p>
+        <p>${data.current.condition.text}</p>
+        <h3>${suggestion}</h3>
+        <button onclick="handleWeatherAction('${action}')">
+          Do this →
+        </button>
+      `;
+    });
+}
+
+function handleWeatherAction(action) {
+  if (action === "movie") {
+    setMode("movie");
+    appState.genreId = 35;
+    fetchMovies();
+  }
+
+  else if (action === "cooking") {
+    setMode("cooking");
+  }
+
+  // ☀️ Outdoor Ideas
+  else if (action === "outdoor") {
+    alert("Go outside! Walk, cycle, explore 🌳");
+  }
+
+  else {
+    alert("Try something fun!");
+  }
+}

@@ -1,24 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>DoToday</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="root">
-        <header>
-            <h3 id="appname">DoToday</h3>
-            <h1>What to do Now?</h1>
-        </header>
 
-        <div id="genre_display"></div>
+  <div id="homeScreen" class="screen center">
+    <h1 class="title">What do you want to do today?</h1>
 
-        <div id="movies_display"></div>
-
+    <div class="card-container">
+      <div class="card" onclick="setMode('movie')">🎬 Movies</div>
+      <div class="card" onclick="setMode('cooking')">🍳 Cooking</div>
+      <div class="card" onclick="setMode('weather')">🌤️ Weather Ideas</div>
     </div>
-    <script src="script.js"></script>
+  </div>
+
+  <div id="appScreen" class="screen hidden">
+
+    <button class="back" onclick="goHome()">←</button>
+
+    <div id="movieSection">
+      <h2>🎬 Movies</h2>
+
+      <input type="text" id="searchInput" placeholder="Search movie..." />
+
+      <div class="moods">
+        <button onclick="setMood('happy')">😊</button>
+        <button onclick="setMood('bored')">😐</button>
+        <button onclick="setMood('energetic')">💪</button>
+        <button onclick="setMood('relaxed')">🧘</button>
+      </div>
+
+      <div id="genre_display"></div>
+      <div id="movies_display" class="grid"></div>
+    </div>
+
+    <div id="cookingSection" class="hidden center">
+      <h2>🍳 Cooking Ideas</h2>
+      <p>Coming soon...</p>
+    </div>
+
+    <div id="weatherSection" class="hidden center">
+      <h2>🌤️ Weather Ideas</h2>
+
+      <input type="text" id="cityInput" placeholder="Enter city..." />
+      <button onclick="getWeather()">Get Suggestion</button>
+
+      <div id="weatherResult"></div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
-
