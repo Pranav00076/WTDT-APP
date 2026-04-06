@@ -39,15 +39,16 @@
 
     <div id="cookingSection" class="hidden center">
       <h2>🍳 Cooking Ideas</h2>
-      <p>Coming soon...</p>
+      <input type="text" id="recipeInput" placeholder="Search for recipes (e.g. Pasta, Chicken...)" />
+      <div id="recipes_display" class="grid"></div>
     </div>
 
     <div id="weatherSection" class="hidden center">
       <h2>🌤️ Weather Ideas</h2>
-
-      <input type="text" id="cityInput" placeholder="Enter city..." />
-      <button onclick="getWeather()">Get Suggestion</button>
-
+      <div class="weather-input">
+        <input type="text" id="cityInput" placeholder="Enter city..." />
+        <button onclick="getWeather()">Get Suggestion</button>
+      </div>
       <div id="weatherResult"></div>
     </div>
 

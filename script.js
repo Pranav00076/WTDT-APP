@@ -1,5 +1,6 @@
 const apiKey = "36aae90582723ed9c3894e15dddbb1ab";
 const weatherKey = "cdc47ddac1ec469381f215204263003";
+const spoonacularKey = "3187e07f00ce442f95007e8bc9377862";
 
 let appMode = "home";
 
@@ -117,7 +118,43 @@ fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${apiKey}`)
     });
   });
 
-// WEATHER
+// COOKING
+function renderRecipes(recipes) {
+  recipes_display.innerHTML = "";
+
+  recipes.forEach(recipe => {
+    const div = document.createElement("div");
+    div.className = "recipe";
+
+    const img = recipe.image || "https://via.placeholder.com/300x200";
+
+    div.innerHTML = `
+      <img src="${img}" />
+      <h3>${recipe.title}</h3>
+      <p>⌚ Ready in ${recipe.readyInMinutes || '??'} mins</p>
+    `;
+
+    recipes_display.appendChild(div);
+  });
+}
+
+function fetchRecipes(query) {
+  if (!query) return;
+
+  recipes_display.innerHTML = "Loading recipes...";
+  const url = `https://api.spoonacular.com/recipes/complexSearch?apiKey=${spoonacularKey}&query=${query}&addRecipeInformation=true&number=12`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => renderRecipes(data.results || []));
+}
+
+recipeInput.addEventListener("input", e => {
+  const query = e.target.value;
+  if (query.length > 2) {
+    fetchRecipes(query);
+  }
+});
 function getWeather() {
   const city = document.getElementById("cityInput").value;
 
@@ -128,41 +165,58 @@ function getWeather() {
   fetch(url)
     .then(res => res.json())
     .then(data => {
-      const condition = data.current.condition.text.toLowerCase();
+      const condition = data.current.condition.text;
+      const icon = data.current.condition.icon;
       const temp = data.current.temp_c;
+      const feelsLike = data.current.feelslike_c;
+      const humidity = data.current.humidity;
+      const wind = data.current.wind_kph;
       const location = data.location.name;
 
       let suggestion = "";
       let action = "";
 
-      if (condition.includes("rain")) {
+      const cond = condition.toLowerCase();
+      if (cond.includes("rain")) {
         suggestion = "Perfect weather for movies 🎬";
         action = "movie";
-      }
-
-      else if (condition.includes("sun") || condition.includes("clear")) {
+      } else if (cond.includes("sun") || cond.includes("clear")) {
         suggestion = "Great time to go outside 🌳";
         action = "outdoor";
-      }
-
-      else if (condition.includes("cloud")) {
+      } else if (cond.includes("cloud")) {
         suggestion = "Nice cozy weather for cooking 🍳";
         action = "cooking";
-      }
-
-      else {
+      } else {
         suggestion = "Try something relaxing 😊";
         action = "general";
       }
 
       weatherResult.innerHTML = `
-        <h3>${location}</h3>
-        <p>🌡️ ${temp}°C</p>
-        <p>${data.current.condition.text}</p>
-        <h3>${suggestion}</h3>
-        <button onclick="handleWeatherAction('${action}')">
-          Do this →
-        </button>
+        <div class="weather-card">
+          <div class="weather-main">
+            <img src="https:${icon}" class="weather-icon" />
+            <div class="temp-container">
+              <span class="temp">${temp}°C</span>
+              <span class="condition">${condition}</span>
+            </div>
+          </div>
+          
+          <div class="weather-info">
+            <h3>${location}</h3>
+            <div class="details">
+              <span>🌡️ Feels like: ${feelsLike}°C</span>
+              <span>💧 Humidity: ${humidity}%</span>
+              <span>💨 Wind: ${wind} km/h</span>
+            </div>
+          </div>
+
+          <div class="weather-suggestion">
+            <p>${suggestion}</p>
+            <button class="action-btn" onclick="handleWeatherAction('${action}')">
+              Take Action →
+            </button>
+          </div>
+        </div>
       `;
     });
 }
@@ -176,6 +230,8 @@ function handleWeatherAction(action) {
 
   else if (action === "cooking") {
     setMode("cooking");
+    recipeInput.value = "comfort food";
+    fetchRecipes("comfort food");
   }
 
   // ☀️ Outdoor Ideas
