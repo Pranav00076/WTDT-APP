@@ -66,7 +66,7 @@ DoToday/
 
 ## 🌐 Live Demo
 
-👉 https://pranav00076.github.io/WDTD-APP/
+👉 [https://pranav00076.github.io/WDTD-APP/](https://pranav00076.github.io/WTDT-APP/)
 
 ---
 
